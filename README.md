@@ -26,9 +26,15 @@ subjects
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 0.39 | 0.22 | -0.05 | 0.09 | 0.88 | 0.63 | 0.21 | 0.41 | 0.62 | 0.48 |
 
+# The best team in the competition achieved
+
+| kappa | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.60 | 0.40 | 0.21 | 0.22 | 0.95 | 0.86 | 0.61 | 0.56 | 0.85 | 0.74 |
 
 # TO DO
-:green_circle: very important, :yellow_circle: important, :red_circle: not important right now,
+:green_circle: very important, :yellow_circle: important, :red_circle: not important right now
+
 Based on implementation effort and how promising the idea is
 
 - :green_circle: Discuss using CaiT instead of ViT with Omair
