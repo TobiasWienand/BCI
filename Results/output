@@ -1,0 +1,40 @@
+TESTING SUBJECT 1
+Fold : 3 - Epoch : 500 - loss : 0.0084 - acc: 0.9961 - val_loss : 2.9408 - val_acc: 0.5225 - highest_observed_val_acc: 0.7808
+Test Accuracy: 0.6085069179534912
+----------------------------------------------
+TESTING SUBJECT 2
+Fold : 3 - Epoch : 500 - loss : 0.0027 - acc: 1.0000 - val_loss : 2.4996 - val_acc: 0.5395 - highest_observed_val_acc: 0.6653
+Test Accuracy: 0.474056601524353
+----------------------------------------------
+TESTING SUBJECT 3
+Fold : 3 - Epoch : 500 - loss : 0.0004 - acc: 1.0000 - val_loss : 2.0671 - val_acc: 0.4578 - highest_observed_val_acc: 0.8281
+Test Accuracy: 0.5431743264198303
+----------------------------------------------
+TESTING SUBJECT 4
+Fold : 3 - Epoch : 500 - loss : 0.0001 - acc: 1.0000 - val_loss : 0.6840 - val_acc: 0.8958 - highest_observed_val_acc: 0.9705
+Test Accuracy: 0.941360354423523
+----------------------------------------------
+TESTING SUBJECT 5
+Fold : 3 - Epoch : 500 - loss : 0.0007 - acc: 1.0000 - val_loss : 1.6781 - val_acc: 0.7734 - highest_observed_val_acc: 0.9297
+Test Accuracy: 0.8130514621734619
+----------------------------------------------
+TESTING SUBJECT 6
+Fold : 3 - Epoch : 500 - loss : 0.0315 - acc: 1.0000 - val_loss : 2.3185 - val_acc: 0.5281 - highest_observed_val_acc: 0.8094
+Test Accuracy: 0.6046742796897888
+----------------------------------------------
+TESTING SUBJECT 7
+Fold : 3 - Epoch : 500 - loss : 0.0028 - acc: 1.0000 - val_loss : 1.9158 - val_acc: 0.6881 - highest_observed_val_acc: 0.8350
+Test Accuracy: 0.703125
+----------------------------------------------
+TESTING SUBJECT 8
+Fold : 3 - Epoch : 500 - loss : 0.0003 - acc: 1.0000 - val_loss : 1.7951 - val_acc: 0.6927 - highest_observed_val_acc: 0.8151
+Test Accuracy: 0.8120888471603394
+----------------------------------------------
+TESTING SUBJECT 9
+Fold : 3 - Epoch : 500 - loss : 0.0108 - acc: 1.0000 - val_loss : 1.8121 - val_acc: 0.6953 - highest_observed_val_acc: 0.8281
+Test Accuracy: 0.7394604682922363
+----------------------------------------------
+COHEN_KAPPAS: intra (mean, subject 1, ... subject 9): [ 0.38655517  0.21701384 -0.0518868   0.08634865  0.88272071  0.62610292
+  0.20934856  0.40625     0.62417769  0.47892094]
+
+Process finished with exit code 0
