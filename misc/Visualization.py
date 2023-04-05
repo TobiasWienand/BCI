@@ -1,17 +1,7 @@
-import itertools
 import numpy as np
-from numpy import concatenate as cat
-from scipy.io import loadmat
-from scipy.signal import stft
 import matplotlib.pyplot as plt
 
-####### HARDCORE GLOBAL VARIABLES THAT DONT CHANGE #######
-T = []
-E = []
-fs = 250 # sampling frequency
-##########################################################
-
-def plt_avg_spectra_diff(f, t, Zxx_all, Y, freq_range, window_size, subjects):
+def plt_avg_spectra_diff_stft(f, t, Zxx_all, Y, freq_range, window_size, subjects):
     """
     :param f: Vector of frequencies returned by STFT
     :param t: Vector of hanning window start points returned by STFT
@@ -60,7 +50,7 @@ def plt_avg_spectra_diff(f, t, Zxx_all, Y, freq_range, window_size, subjects):
 
     plt.show()
 
-def plot_avg_spectra_left_right(f, t, Zxx_all, Y, freq_range, window_size):
+def plot_avg_spectra_left_right_stft(f, t, Zxx_all, Y, freq_range, window_size):
     """
     :param f: Vector of frequencies returned by STFT
     :param t: Vector of hanning window start points returned by STFT
@@ -109,72 +99,73 @@ def plot_avg_spectra_left_right(f, t, Zxx_all, Y, freq_range, window_size):
 
     plt.show()
 
+def visualize_preprocessing(x_train, x_train_filtered, y_train):
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8))
+    fig.suptitle('Preprocessing with 8-35 Hz BPF', fontsize=16)
+    axs[0].plot(x_train[0, 0, :], label="x[0,0,:]")
+    axs[0].plot(x_train_filtered[0, 0, :], label="x_filtered[0,0,:]")
+    axs[0].set_title("Example Signal Before and After")
+    axs[0].set_ylabel("V")
+    axs[0].set_xlabel("t_i with fs = 250")
+    axs[0].legend()
 
-def get_trials(subjects, start, stop, dataset):
-    """
-    For the given subjects, extract the EEG time series from all trials and all sessions.
-    :param subjects: list or int, representing subjects to extract trials from
-    :param start: f_s * t, e.g. 250*3 for cue start in Screening
-    :param stop: f_s * t, e.g. 250 * 7.5 for feedback period stop in Smiley Feedback
-    :param dataset: "training", "eval", or "both"
-    :return: X (EEG array: trials X 3 X duration) and y (vector of labels, i.e. numbers)
-    """
-    if type(subjects) == int:
-        subjects = [subjects]
+    y_train_label_1_mean = np.mean(x_train[y_train==1, 0, :], axis=0)
+    y_train_label_2_mean = np.mean(x_train[y_train==2, 0, :], axis=0)
+    y_train_filtered_label_1_mean = np.mean(x_train_filtered[y_train==1, 0, :], axis=0)
+    y_train_filtered_label_2_mean = np.mean(x_train_filtered[y_train==2, 0, :], axis=0)
 
-    if dataset == "both":
-        X_t, Y_t = get_trials(subjects, start, stop, "train")
-        X_e, Y_e = get_trials(subjects, start, stop, "eval")
-        return cat([X_t, X_e]) , cat([Y_t, Y_e])
+    axs[1].plot(y_train_label_1_mean - y_train_label_2_mean, label="Original")
+    axs[1].plot(y_train_filtered_label_1_mean - y_train_filtered_label_2_mean, label="Filtered")
+    axs[1].set_title("Differences between Mean Signals with Class Label 1 vs Class Label 2")
+    axs[1].set_ylabel("V")
+    axs[1].set_xlabel("t_i with fs = 250")
+    axs[1].legend()
 
-    matlab_data = T if dataset == "train" else E
-    subject_data = [matlab_data[subject_id-1] for subject_id in subjects] # -1 because matlab indexing starts with 1
+    plt.tight_layout()
+    plt.show()
 
-    X_t = []
-    Y_t = []
+def visualize_cwt(x_train_cwt, y_train, start, stop, HI, LO):
+    # Create 3 subplots
+    f, axarr = plt.subplots(3, sharex=True, sharey=True)
+    f.suptitle('Difference between Mean Spectra of Class 1 and 2', fontsize=16)
+    axarr[0].set_title('C3')
+    axarr[1].set_title('CZ')
+    axarr[2].set_title('C4')
+    # Iterate over all three channels
 
-    for struct, session in itertools.product(subject_data, range(3 if dataset == "train" else 2)): # 3 sessions in train, only 2 in eval
-        data = struct["data"][0][session]
-        X = data['X'][0][0]
-        y = data['y'][0][0]
-        trial_times = data['trial'][0][0]
-        artifacts = data['artifacts'][0][0]
+    diff_matrices = []
+    for k in range(3):
+        # Get mean values of each class
+        class_1 = np.mean(x_train_cwt[y_train == 1, k, :, :], axis=0)
+        class_2 = np.mean(x_train_cwt[y_train == 2, k, :, :], axis=0)
+        # Calculate the difference
+        difference = np.abs(class_1 - class_2)
+        # Plot the difference
+        axarr[k].imshow(difference, cmap=plt.cm.seismic, aspect='auto')
 
-        for i in range(len(trial_times)):
-            if not artifacts[i]:
-                X_t.append(X[trial_times[i, 0]-1+start:trial_times[i, 0]-1+stop][:,:3]) #Ignore EOG -> [:,:3]
-                Y_t.append(y[i])
-    return np.stack(X_t), np.stack(Y_t).ravel() # ravel => remove dimension of length 1
+        # Set the y-axis ticks in Hz
+        tick_locs = [0, x_train_cwt.shape[-2] / 2, x_train_cwt.shape[-2] - 1]
+        tick_labels = [LO, (HI - LO) / 2, HI]
+        axarr[k].set_yticks(tick_locs)
+        axarr[k].set_yticklabels(tick_labels)
 
+        diff_matrices.append(difference)
 
-################################################################
-############################# MAIN #############################
-################################################################
-
-# LOAD .MAT DATA
-for i in range(1,10):
-    E.append(loadmat(f"../Data/B0{str(i)}E.mat"))
-    T.append(loadmat(f"../Data/B0{str(i)}T.mat"))
-
-
-start = 3*fs
-stop = 7*fs
-duration = stop - start + 1
-
-# EXTRACT IMAGERY PERIOD DATA FROM ALL TRIALS, SESSIONS AND SUBJECTS
-for subject in range(1,10):
-    X_time, Y = get_trials(subject, start=start, stop=stop, dataset="train")
-
-    # TRANSFORM THE TIME SERIES INTO THE FREQUENCY DOMAIN WITH STFT
-    # SWAPAXES BECAUSE STFT IS COMPUTED OVER THE LAST AXIS
-    X_time = X_time.swapaxes(1, 2)
-
-    for f_range in [(0, 30)]:
-        for size in [128]:
-            f, t, Zxx = stft(X_time, nperseg=size, fs=250)
-            t += start/fs # stft assumes that X_time starts at t=0, which is not true
-            plt_avg_spectra_diff(f, t, Zxx, Y, freq_range=f_range, window_size=size, subjects=subject)
+    # Set the y-axis label
+    axarr[1].set_ylabel('f (Hz)')
+    # Set the x-axis label
+    axarr[2].set_xlabel('Time (s)')
 
 
+    # Set the x-axis ticks in seconds
+    tick_locs = np.arange(0, x_train_cwt.shape[-1], 250)
+    tick_labels = np.arange(start/250, stop/250, 1)
+    axarr[2].set_xticks(tick_locs)
+    axarr[2].set_xticklabels(tick_labels)
 
-#cA, cD = pywt.dwt(X_time, wavelet='db4')
+
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
+
+    return diff_matrices[0], diff_matrices[1], diff_matrices[2]

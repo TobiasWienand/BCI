@@ -1,52 +1,60 @@
 # Quick start
-Run trainOne_testOne.py to do the following:
+Run BPF_CWT_CaiT.py to do the following:
 ```
-for s in all_subjects:
-	train(ViT, s)
-	test(s)
+1. Bandpassfilter 8-30 Hz
+2. Continuous Wavelet Transform with the morl Wavelet
+3. Classify with CaiT 
 ```
-Run trainAll_testAll.py to do the following:
+Run STFT_CaiT.py to do the following:
 ```
-train(ViT, all_subjects)
-test(all_subjects)
+1. STFT with win=512 and overlap=500 for high time and frequency resolution.
+2. CaiT uses 5x5 patches to process 45x85 PSD's (PSD=spectra over time)
 ```
+Run STFT_rectangular_CaiT.py to do the following:
+```
+1. STFT with win=128 and overlap=121 for high time and low frequency resolution.
+2. Standardize the data to allow for better GD behavior
+3. CaiT uses 11x11 patches to process 11x143 PSD's (PSD=spectra over time), i.e. time segments
+```
+# Experimental Results
+
+
+| Method                | Accuracy (%) | 
+|-----------------------|--------------|
+| Best Team             | 80           | 
+| Rectangular STFT CaiT | 77.60        | 
+| STFT CaiT             | 76.38        |
+| STFT AutoML with TPOT | 71           |
+| ROCKET                | 69           |
+| Wavelet CaiT          | 68           |
+
+
 
 # Data Visualization
-![alt text](Results/abs_mean_spectra_diff.png)
+![alt text](Results/STFT.png)
+![alt text](Results/CWT.png)
 
-Using STFT to transform the data from all subjects interval-based into
-the frequency domain, we can see that during the MI phase (4-7 seconds) there
-is a clear difference in the mean spectra across all trials. However, this clear
-difference is not always the case when looking at individual trials or individual
-subjects
 
-# Using the CaiT Visual Transformer on the data
 
-| kappa | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0.39 | 0.22 | -0.05 | 0.09 | 0.88 | 0.63 | 0.21 | 0.41 | 0.62 | 0.48 |
-
-# The best team in the competition achieved
-
-| kappa | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0.60 | 0.40 | 0.21 | 0.22 | 0.95 | 0.86 | 0.61 | 0.56 | 0.85 | 0.74 |
 
 # TO DO
 :green_circle: very important, :yellow_circle: important, :red_circle: not important right now
 
 Based on implementation effort and how promising the idea is
 
-- :green_circle: Discuss using CaiT instead of ViT with Omair
-- :green_circle: Hyperparameter tuning
-- :green_circle: Cutting Time and frequency axis to reduce variables with low predictive power
-- :green_circle: Implement ROCKET and compare with CaiT
-- :green_circle: Gain insights on what made different approaches more successful by looking at the winners papers in detail
+
+- :green_circle: Reproducing the Results from the below table
 - :yellow_circle: Learning schedule for faster and better results
-- :yellow_circle: Sliding Window instead of whole MI
-- :yellow_circle: Using other transformations on the raw data, e.g. Wavelet
-- :yellow_circle: Normalizing/ Standardizing Data for better results
-- :yellow_circle: Ensembling time and frequency. Or same model but trained on differently transformed data
 - :red_circle: Brain float for trading accuracy with speed
 - :red_circle: Torch DataLoader to load data faster
 
+# Discussion List
+
+- :green_circle: The table below
+- :red_circle: AutoML was not satisfactory
+- :red_circle: ROCKET, the best time series classifer, was very bad => we need time-frequency analysis for feature extraction
+- :red_circle: Wavelet did not perform very well
+
+
+# New Ideas
+![alt text](Results/results_from_others.png)

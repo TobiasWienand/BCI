@@ -17,7 +17,7 @@ def train(v_start, X_train, Y_train, epochs, crossval, fancy_plot=True):
     batch_size = 64
     criterion = nn.CrossEntropyLoss()
 
-    fig, axs = plt.subplots(1, crossval, sharex="all", sharey="all")
+    fig, axs = plt.subplots(2, crossval, sharex="all", sharey="all")
     fig.set_figheight(4)
     fig.set_figwidth(4*crossval)
 
@@ -31,6 +31,9 @@ def train(v_start, X_train, Y_train, epochs, crossval, fancy_plot=True):
 
         train_acc_history = []
         val_acc_history = []
+
+        train_loss_history = []
+        val_loss_history = []
 
         for epoch in range(epochs):
             epoch_loss = 0
@@ -80,14 +83,20 @@ def train(v_start, X_train, Y_train, epochs, crossval, fancy_plot=True):
             )
             train_acc_history.append(float(epoch_accuracy))
             val_acc_history.append(float(epoch_val_accuracy))
+            train_loss_history.append(float(epoch_loss))
+            val_loss_history.append(float(epoch_val_loss))
+
         if fancy_plot:
-            axs[k].plot(train_acc_history)
-            axs[k].plot(val_acc_history)
-            axs[k].set_title(f"Fold k = {k}")
-            axs[k].set_xlabel("# Epochs")
-            axs[0].set_ylabel("% Accuracy")
-            axs[k].legend(["Train", "Val"])
-            axs[k].set(adjustable='box')
+            axs[0, k].plot(train_acc_history)
+            axs[0, k].plot(val_acc_history)
+            axs[0, k].set_title(f"Fold k = {k}")
+            axs[0, 0].set_ylabel("% Accuracy")
+            axs[0, k].legend(["Train", "Val"])
+            axs[0, k].set(adjustable='box')
+            axs[1, k].set_xlabel("# Epochs")
+            axs[1, 0].set_ylabel("Loss")
+            axs[1, k].plot(train_loss_history)
+            axs[1, k].plot(val_loss_history)
 
     if fancy_plot:
         #plt.tight_layout()
