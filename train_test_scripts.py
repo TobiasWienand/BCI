@@ -7,33 +7,33 @@ import matplotlib.pyplot as plt
 from torch import Tensor
 from copy import deepcopy
 
-
-
-def train(v_start, X_train, Y_train, epochs, crossval, fancy_plot=True):
-    highest_observed_val_acc = 0
-    best_model = None
-
+def fit_predict(v_start, x_train, y_train, x_test, y_test, epochs, crossval, fancy_plot=True):
     lr = 3e-5
     batch_size = 64
     criterion = nn.CrossEntropyLoss()
+    total_test_accuracy = 0
 
-    fig, axs = plt.subplots(2, crossval, sharex="all", sharey="all")
-    fig.set_figheight(4)
-    fig.set_figwidth(4*crossval)
+    if fancy_plot:
+        fig, axs = plt.subplots(2, crossval, sharex="all", sharey="all")
+        fig.set_figheight(4)
+        fig.set_figwidth(4 * crossval)
 
     for k in range(crossval):
-        x_train, x_val, y_train, y_val = train_test_split(X_train, Y_train, stratify=Y_train)
+        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, stratify=y_train)
         batches_train = ceil((x_train.shape[0] / batch_size))
         batches_val = ceil((x_val.shape[0] / batch_size))
+        batches_test = ceil((x_test.shape[0] / batch_size))
 
         v = deepcopy(v_start).to("cuda")
         optimizer = optim.Adam(v.parameters(), lr=lr)
 
         train_acc_history = []
         val_acc_history = []
-
         train_loss_history = []
         val_loss_history = []
+
+        highest_observed_val_acc = 0
+        best_model = None
 
         for epoch in range(epochs):
             epoch_loss = 0
@@ -77,10 +77,6 @@ def train(v_start, X_train, Y_train, epochs, crossval, fancy_plot=True):
                 highest_observed_val_acc = epoch_val_accuracy
                 best_model = deepcopy(v)
 
-            print(
-                f"\rFold : {k + 1} - Epoch : {epoch + 1} - loss : {epoch_loss:.4f} - acc: {epoch_accuracy:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} - highest_observed_val_acc: {highest_observed_val_acc:.4f}",
-                end=''
-            )
             train_acc_history.append(float(epoch_accuracy))
             val_acc_history.append(float(epoch_val_accuracy))
             train_loss_history.append(float(epoch_loss))
@@ -97,26 +93,23 @@ def train(v_start, X_train, Y_train, epochs, crossval, fancy_plot=True):
             axs[1, 0].set_ylabel("Loss")
             axs[1, k].plot(train_loss_history)
             axs[1, k].plot(val_loss_history)
+        # Test the best model on the test set for the current fold
+        epoch_test_accuracy = 0
+        for batch_index in range(batches_test):
+            data = Tensor(x_test)[batch_index * batch_size: (batch_index + 1) * batch_size]
+            label = Tensor(y_test)[batch_index * batch_size: (batch_index + 1) * batch_size].long() - 1
+            data = data.to("cuda")
+            label = label.to("cuda")
+
+            test_output = best_model(data)
+
+            acc = (test_output.argmax(dim=1) == label).float().mean()
+            epoch_test_accuracy += acc / batches_test
+
+        total_test_accuracy += epoch_test_accuracy / crossval
 
     if fancy_plot:
-        #plt.tight_layout()
+        plt.tight_layout()
         plt.show()
-    print("")
-    return best_model
 
-
-def test(best_model, x_test, y_test):
-    epoch_test_accuracy = 0
-    batch_size = 64
-    batches_test = ceil((x_test.shape[0] / batch_size))
-    for batch_index in range(batches_test):
-        data = Tensor(x_test)[batch_index * batch_size: (batch_index + 1) * batch_size]
-        label = Tensor(y_test)[batch_index * batch_size: (batch_index + 1) * batch_size].long() - 1
-        data = data.to("cuda")
-        label = label.to("cuda")
-
-        test_output = best_model(data)
-
-        acc = (test_output.argmax(dim=1) == label).float().mean()
-        epoch_test_accuracy += acc / batches_test
-    return float(epoch_test_accuracy)
+    return float(total_test_accuracy)

@@ -2,7 +2,8 @@ import itertools
 import numpy as np
 from numpy import concatenate as cat
 from scipy.io import loadmat
-
+import math
+import csv
 
 ####### HARDCODED GLOBAL VARIABLES THAT DONT CHANGE #######
 fs = 250  # sampling frequency
@@ -51,3 +52,22 @@ def get_trials(subjects, start, stop, dataset):
                 X_t.append(X[trial_times[i, 0]-1+start:trial_times[i, 0]-1+stop][:,:3]) #Ignore EOG -> [:,:3]
                 Y_t.append(y[i])
     return np.stack(X_t), np.stack(Y_t).ravel() # ravel => remove dimension of length 1
+
+def divisors(n):
+    divs = [1]
+    for i in range(2,int(math.sqrt(n))+1):
+        if n%i == 0:
+            divs.extend([i,int(n/i)])
+    divs.extend([n])
+    return list(set(divs))
+
+
+def sort_results_by_accuracy(results):
+    return sorted(results, key=lambda x: x[-1], reverse=True)
+
+def save_results_to_csv(filename, header, results):
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(header)
+        for result in results:
+            writer.writerow(result)

@@ -1,60 +1,46 @@
-# Quick start
-Run BPF_CWT_CaiT.py to do the following:
-```
-1. Bandpassfilter 8-30 Hz
-2. Continuous Wavelet Transform with the morl Wavelet
-3. Classify with CaiT 
-```
-Run STFT_CaiT.py to do the following:
-```
-1. STFT with win=512 and overlap=500 for high time and frequency resolution.
-2. CaiT uses 5x5 patches to process 45x85 PSD's (PSD=spectra over time)
-```
-Run STFT_rectangular_CaiT.py to do the following:
-```
-1. STFT with win=128 and overlap=121 for high time and low frequency resolution.
-2. Standardize the data to allow for better GD behavior
-3. CaiT uses 11x11 patches to process 11x143 PSD's (PSD=spectra over time), i.e. time segments
-```
-# Experimental Results
+# Roadmap
+This README serves to illustrate the progress in this project.
+## 1. Rectangular Patches for CaiT :heavy_check_mark:
+We have implemented rectangular patches for the CaiT architecture, which allows us to analyze how ViTs perform in the frequency domain.
 
+## 2. Per Subject Test Accuracy :heavy_check_mark:
 
-| Method                | Accuracy (%) | 
-|-----------------------|--------------|
-| Best Team             | 80           | 
-| Rectangular STFT CaiT | 77.60        | 
-| STFT CaiT             | 76.38        |
-| STFT AutoML with TPOT | 71           |
-| ROCKET                | 69           |
-| Wavelet CaiT          | 68           |
+We have calculated the test accuracy for each subject, providing us with a granular understanding of how well our models perform on individual cases.
 
+## 3. Grid Search :heavy_check_mark:
 
+We have employed grid search to optimize hyperparameters for each feature extraction method, ensuring that we make accurate statements about the quality of extracted features.
 
-# Data Visualization
-![alt text](Results/STFT.png)
-![alt text](Results/CWT.png)
+## 4. Feature Extraction Methods
 
+We will investigate various feature extraction methods, including:
 
+-   4.1 Short-Time Fourier Transform (STFT)
+    
+    -   Parameters: window size, overlap, ~~window type (e.g. hanning)~~
+-   4.2 Hilbert-Huang Transform (HHT)
+    
+    -   Parameters: maxiter, nbsym, stop_fun
+-   4.3 Continuous Wavelet Transform (CWT)
+    
+    -   Parameters: wavelet function (e.g., Daubechies, Haar, etc.), scales, method (fft vs conv)
+-   4.4 Stockwell Transform (S-Transform)
+    
+    -   Parameters: gamma (trades frequency with time resolution), wave type (gauss/kazemi)
+-   4.5 Discrete Wavelet Transform (DWT)
+    
+    -   Parameters: wavelet function, signal extension mode
+-   4.6 (Optional) Wigner-Ville Distribution
+    
+    -   Python module: tftb.processing.WignerVilleDistribution (no tunable parameters)
+  
+## 5. Ensemble Methods
 
+After obtaining the best parameters for each transformation, we will explore ensemble methods to improve the performance of our models:
 
-# TO DO
-:green_circle: very important, :yellow_circle: important, :red_circle: not important right now
+-   5.1 Weighted Voting
+    -   Implement weighted voting based on the probability distribution of each class predicted by the ViT models.
 
-Based on implementation effort and how promising the idea is
+## 6. Review and Future Steps
 
-
-- :green_circle: Reproducing the Results from the below table
-- :yellow_circle: Learning schedule for faster and better results
-- :red_circle: Brain float for trading accuracy with speed
-- :red_circle: Torch DataLoader to load data faster
-
-# Discussion List
-
-- :green_circle: The table below
-- :red_circle: AutoML was not satisfactory
-- :red_circle: ROCKET, the best time series classifer, was very bad => we need time-frequency analysis for feature extraction
-- :red_circle: Wavelet did not perform very well
-
-
-# New Ideas
-![alt text](Results/results_from_others.png)
+-   We will have a meeting to review the intermediate results and plan the next steps, which may include different ensembling methods or moving to the time domain.

@@ -129,9 +129,10 @@ class Transformer(nn.Module):
 class CaiT(nn.Module):
     def __init__(
         self,
-        *,
-        image_size,
-        patch_size,
+        image_height,
+        image_width,
+        patch_height,
+        patch_width,
         num_classes,
         dim,
         depth,
@@ -144,12 +145,14 @@ class CaiT(nn.Module):
         layer_dropout = 0.
     ):
         super().__init__()
-        assert image_size % patch_size == 0, 'Image dimensions must be divisible by the patch size.'
-        num_patches = (image_size // patch_size) ** 2
-        patch_dim = 3 * patch_size ** 2
+        assert image_height % patch_height == 0 and image_width % patch_width == 0, 'Image dimensions must be divisible by the patch size.'
+        num_patches_h = image_height // patch_height
+        num_patches_w = image_width // patch_width
+        num_patches = num_patches_h * num_patches_w
+        patch_dim = 3 * patch_height * patch_width
 
         self.to_patch_embedding = nn.Sequential(
-            Rearrange('b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1 = patch_size, p2 = patch_size),
+            Rearrange('b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1 = patch_height, p2 = patch_width),
             nn.LayerNorm(patch_dim),
             nn.Linear(patch_dim, dim),
             nn.LayerNorm(dim)
