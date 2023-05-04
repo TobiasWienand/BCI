@@ -20,7 +20,7 @@ x_test = x_test.swapaxes(1, 2)
 
 
 results = []
-for window_size, overlap in [(128,120), (256, 250), (512, 500) ]:
+for window_size, overlap in [(128, 64), (512, 500) ]:
     for segment_size in [2, 5]:
 
         # 3.) TRANSFORM TO FREQUENCY DOMAIN

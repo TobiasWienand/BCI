@@ -1,5 +1,7 @@
 # Roadmap
 This README serves to illustrate the progress in this project.
+
+:clock1: STFT.csv will be uploaded this week. Currently the GPU is working on full throttle to complete the grid search
 ## 1. Rectangular Patches for CaiT :heavy_check_mark:
 We have implemented rectangular patches for the CaiT architecture, which allows us to analyze how ViTs perform in the frequency domain.
 
@@ -15,7 +17,7 @@ We have employed grid search to optimize hyperparameters for each feature extrac
 
 We will investigate various feature extraction methods, including:
 
--   4.1 Short-Time Fourier Transform (STFT)
+-   4.1 Short-Time Fourier Transform (STFT) :heavy_check_mark:
     
     -   Parameters: window size, overlap, ~~window type (e.g. hanning)~~
 -   4.2 Hilbert-Huang Transform (HHT)
