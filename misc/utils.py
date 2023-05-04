@@ -16,7 +16,7 @@ def get_trials(subjects, start, stop, dataset):
     :param start: f_s * t, e.g. 250*3 for cue start in Screening
     :param stop: f_s * t, e.g. 250 * 7.5 for feedback period stop in Smiley Feedback
     :param dataset: "training", "eval", or "both"
-    :return: X (EEG array: trials X 3 X duration) and y (vector of labels, i.e. numbers)
+    :return: X (EEG array: trials X 3 X duration), y (vector of labels, i.e. numbers) and subject IDs (see y)
     """
     T = []
     E = []
@@ -35,12 +35,13 @@ def get_trials(subjects, start, stop, dataset):
         return cat([X_t, X_e]) , cat([Y_t, Y_e])
 
     matlab_data = T if dataset == "train" else E
-    subject_data = [matlab_data[subject_id-1] for subject_id in subjects] # -1 because matlab indexing starts with 1
+    subject_data = [(matlab_data[subject_id-1], subject_id) for subject_id in subjects] # -1 because matlab indexing starts with 1
 
     X_t = []
     Y_t = []
+    subject_labels = []
 
-    for struct, session in itertools.product(subject_data, range(3 if dataset == "train" else 2)): # 3 sessions in train, only 2 in eval
+    for (struct, subject_id), session in itertools.product(subject_data, range(3 if dataset == "train" else 2)): # 3 sessions in train, only 2 in eval
         data = struct["data"][0][session]
         X = data['X'][0][0]
         y = data['y'][0][0]
@@ -51,7 +52,8 @@ def get_trials(subjects, start, stop, dataset):
             if not artifacts[i]:
                 X_t.append(X[trial_times[i, 0]-1+start:trial_times[i, 0]-1+stop][:,:3]) #Ignore EOG -> [:,:3]
                 Y_t.append(y[i])
-    return np.stack(X_t), np.stack(Y_t).ravel() # ravel => remove dimension of length 1
+                subject_labels.append(subject_id)
+    return np.stack(X_t), np.stack(Y_t).ravel(), np.stack(subject_labels) # ravel => remove dimension of length 1
 
 def divisors(n):
     divs = [1]
