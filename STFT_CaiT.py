@@ -60,14 +60,14 @@ for window_size, overlap in [(128, 64), (512, 500) ]:
                             layer_dropout = layer_dropout # Unique to CaiT. Triple regularization
                         )
 
-                    total_acc, individual_accs = fit_predict(v, Zxx_train, y_train, Zxx_test, y_test, IDs, epochs=10, crossval=10)
-                    print("Total Test Accuracy:", total_acc)
-                    result = [window_size, overlap, segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc]
-                    # Add individual accuracies to the result list
-                    for subject_id in sorted(individual_accs.keys()):
-                        result.append(individual_accs[subject_id])
+                        total_acc, individual_accs = fit_predict(v, Zxx_train, y_train, Zxx_test, y_test, IDs, epochs=10, crossval=10)
+                        print("Total Test Accuracy:", total_acc)
+                        result = [window_size, overlap, segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc]
+                        # Add individual accuracies to the result list
+                        for subject_id in sorted(individual_accs.keys()):
+                            result.append(individual_accs[subject_id])
 
-                    results.append(result)
+                        results.append(result)
 
 # Save the results to a CSV file
 sorted_results = sort_results_by_accuracy(results)
