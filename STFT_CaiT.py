@@ -70,6 +70,5 @@ for window_size, overlap in [(128, 64), (512, 500) ]:
                         results.append(result)
 
 # Save the results to a CSV file
-sorted_results = sort_results_by_accuracy(results)
 header = ["Window_Size", "Overlap", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)]
-save_results_to_csv("Results/STFT.csv", header, sorted_results)
+save_results_to_csv("Results/STFT.csv", header, results)

@@ -20,9 +20,9 @@ We will investigate various feature extraction methods, including:
 -   4.1 Short-Time Fourier Transform (STFT) :heavy_check_mark:
     
     -   Parameters: window size, overlap, ~~window type (e.g. hanning)~~
--   4.2 Hilbert-Huang Transform (HHT)
+-   4.2 Hilbert-Huang Transform (HHT) :heavy_check_mark:
     
-    -   Parameters: maxiter, nbsym, stop_fun
+    -   Parameters: ~~maxiter, nbsym, stop_fun~~ density
 -   4.3 Continuous Wavelet Transform (CWT)
     
     -   Parameters: wavelet function (e.g., Daubechies, Haar, etc.), scales, method (fft vs conv)

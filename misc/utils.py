@@ -4,7 +4,7 @@ from numpy import concatenate as cat
 from scipy.io import loadmat
 import math
 import csv
-
+import pandas as pd
 ####### HARDCODED GLOBAL VARIABLES THAT DONT CHANGE #######
 fs = 250  # sampling frequency
 ##########################################################
@@ -55,6 +55,13 @@ def get_trials(subjects, start, stop, dataset):
                 subject_labels.append(subject_id)
     return np.stack(X_t), np.stack(Y_t).ravel(), np.stack(subject_labels) # ravel => remove dimension of length 1
 
+def densify(data, density):
+    assert data.shape[3] % density == 0, "Data size must be divisible by density"
+    densified_data = data.reshape(data.shape[0], data.shape[1], data.shape[2], data.shape[3] // density, density)
+    densified_data = densified_data.sum(axis=4)
+    return densified_data
+
+
 def divisors(n):
     divs = [1]
     for i in range(2,int(math.sqrt(n))+1):
@@ -64,12 +71,13 @@ def divisors(n):
     return list(set(divs))
 
 
-def sort_results_by_accuracy(results):
-    return sorted(results, key=lambda x: x[-1], reverse=True)
-
 def save_results_to_csv(filename, header, results):
-    with open(filename, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(header)
-        for result in results:
-            writer.writerow(result)
+    # Convert the results to a DataFrame
+    df = pd.DataFrame(results, columns=header)
+
+    # Sort by 'Total_Test_Accuracy' if it's in DataFrame columns
+    if 'Total_Test_Accuracy' in df.columns:
+        df = df.sort_values('Total_Test_Accuracy', ascending=False)
+
+    # Save the sorted DataFrame to the CSV file
+    df.to_csv(filename, index=False)
