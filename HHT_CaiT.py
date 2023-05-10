@@ -65,7 +65,7 @@ for density in [5, 10, 20]:
 
                         total_acc, individual_accs = fit_predict(v, Zxx_train_densified, y_train, Zxx_test_densified, y_test, IDs, epochs=10, crossval=10)
                         print("Total Test Accuracy:", total_acc)
-                        result = [segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc]
+                        result = [density, segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc]
                         # Add individual accuracies to the result list
                         for subject_id in sorted(individual_accs.keys()):
                             result.append(individual_accs[subject_id])
@@ -73,5 +73,5 @@ for density in [5, 10, 20]:
                         results.append(result)
 
 # Save the results to a CSV file
-header = ["Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)]
+header = ["Density", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)]
 save_results_to_csv("Results/HHT.csv", header, results)
