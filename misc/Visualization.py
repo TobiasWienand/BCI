@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def visualize_HHT(Zxx_train, t_train, f_train, y_train):
+def visualize(Zxx_train, t_train, f_train, y_train, method):
     # Separate Zxx_train into two classes according to y_train
     Zxx_train_class1 = Zxx_train[y_train == 1]
     Zxx_train_class2 = Zxx_train[y_train == 2]
@@ -26,6 +26,6 @@ def visualize_HHT(Zxx_train, t_train, f_train, y_train):
         axs[i].set_xlabel('Time', fontsize=14) # Adjust fontsize here
         axs[i].set_ylabel('Frequency', fontsize=14) # Adjust fontsize here
 
-    fig.suptitle('Absolute difference of mean HHT spectra for two classes', fontsize=20) # Adjust fontsize here
+    fig.suptitle(f'Absolute difference of mean {method} spectra for two classes', fontsize=20) # Adjust fontsize here
     plt.tight_layout()
     plt.show()

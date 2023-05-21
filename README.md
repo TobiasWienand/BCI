@@ -19,22 +19,19 @@ We will investigate various feature extraction methods, including:
 
 -   4.1 Short-Time Fourier Transform (STFT) :heavy_check_mark:
     
-    -   Parameters: window size, overlap, ~~window type (e.g. hanning)~~
+    -   Parameters: window size, overlap
 -   4.2 Hilbert-Huang Transform (HHT) :heavy_check_mark:
     
-    -   Parameters: ~~maxiter, nbsym, stop_fun~~ density
--   4.3 Continuous Wavelet Transform (CWT)
+    -   Parameters: Density, Segment Size
+-   4.3 Continuous Wavelet Transform (CWT) :heavy_check_mark:
     
-    -   Parameters: wavelet function (e.g., Daubechies, Haar, etc.), scales, method (fft vs conv)
--   4.4 Stockwell Transform (S-Transform)
+    -   Parameters: wavelet function (Morl, Mexh),Density, Segment Size
+-   4.4 Stockwell Transform (S-Transform) :heavy_check_mark:
     
-    -   Parameters: gamma (trades frequency with time resolution), wave type (gauss/kazemi)
--   4.5 Discrete Wavelet Transform (DWT)
-    
-    -   Parameters: wavelet function, signal extension mode
--   4.6 (Optional) Wigner-Ville Distribution
-    
-    -   Python module: tftb.processing.WignerVilleDistribution (no tunable parameters)
+    -   Parameters: Density, Segment Size
+-   4.5 (Optional) Wigner-Ville Distribution
+
+    - Density, Segment Size
   
 ## 5. Ensemble Methods
 
