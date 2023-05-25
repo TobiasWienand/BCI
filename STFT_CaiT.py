@@ -2,6 +2,7 @@ from scipy.signal import stft
 from train_test_scripts import fit_predict
 from vit_pytorch.cait import CaiT
 from misc.utils import *
+from misc.Visualization import visualize
 
 print("Please wait, data extraction in progress...")
 # 1.) DEFINE SUBJECTS AND MOTOR IMAGERY PERIOD
@@ -20,7 +21,7 @@ x_test = x_test.swapaxes(1, 2)
 
 
 results = []
-for window_size, overlap in [(128, 64), (512, 500) ]:
+for window_size, overlap in [(512, 500), (128, 64)]:
     for segment_size in [2, 5]:
 
         # 3.) TRANSFORM TO FREQUENCY DOMAIN
@@ -39,6 +40,8 @@ for window_size, overlap in [(128, 64), (512, 500) ]:
                            constant_values=0)
         Zxx_test = np.pad(Zxx_test, ((0, 0), (0, 0), (0, 0), (0, required_padding)), mode='constant', constant_values=0)
 
+        visualize(Zxx_train, np.array([3 + i / 250 for i in range(Zxx_train.shape[-1])]), f_train,
+                  y_train, "STFT")
         # Grid search the appropriate dimension and dropout for the data format
         for dim in [256, 128]:
             for dropout in [0.1, 0.2]:

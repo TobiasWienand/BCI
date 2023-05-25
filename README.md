@@ -23,9 +23,9 @@ We will investigate various feature extraction methods, including:
 -   4.2 Hilbert-Huang Transform (HHT) :heavy_check_mark:
     
     -   Parameters: Density, Segment Size
--   4.3 Continuous Wavelet Transform (CWT) :heavy_check_mark:
-    
-    -   Parameters: wavelet function (Morl, Mexh),Density, Segment Size
+-   4.3 Continuous Wavelet Transform (CWT) :new:
+    -   Currently being revised: Scales being adapted to wavelet, complex wavelets, parametrized wavelets
+    -   Parameters: wavelet function,Density, Segment Size
 -   4.4 Stockwell Transform (S-Transform) :heavy_check_mark:
     
     -   Parameters: Density, Segment Size

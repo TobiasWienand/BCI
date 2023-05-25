@@ -24,12 +24,12 @@ x_test = x_test.swapaxes(1, 2)
 
 results = []
 # 3.) TRANSFORM TO FREQUENCY DOMAIN
-for wavelet in ["morl", "mexh"]:
+for wavelet in ["cmorB-C", "morl", "mexh"]:  #TODO Work in Progress
     for density in [10, 20]:
         for segment_size in [2, 5]:
 
-            x_train_cwt, freqs_train = pywt.cwt(x_train, np.arange(8, 30), wavelet)
-            x_test_cwt, freqs_test = pywt.cwt(x_test, np.arange(8, 30), wavelet)
+            x_train_cwt, scales_train = pywt.cwt(x_train, pywt.frequency2scale(wavelet, np.arange(8, 30)/fs), wavelet)
+            x_test_cwt, scales_test = pywt.cwt(x_test, pywt.frequency2scale(wavelet, np.arange(8, 30)/fs), wavelet)
             x_train_cwt = x_train_cwt.transpose(1, 2, 0, 3)
             x_test_cwt = x_test_cwt.transpose(1, 2, 0, 3)
 
@@ -40,7 +40,7 @@ for wavelet in ["morl", "mexh"]:
             required_padding = (segment_size - (x_train_cwt.shape[3] % segment_size)) % segment_size
             x_train_cwt = np.pad(x_train_cwt, ((0, 0), (0, 0), (0, 0), (0, required_padding)), mode='constant', constant_values=0)
             x_test_cwt = np.pad(x_test_cwt, ((0, 0), (0, 0), (0, 0), (0, required_padding)), mode='constant', constant_values=0)
-            visualize(x_train_cwt, np.array([3+ i/250 for i in range(x_train_cwt.shape[-1]*density)]), freqs_train, y_train, "CWT")
+            visualize(x_train_cwt, np.array([3+ i/250 for i in range(x_train_cwt.shape[-1]*density)]), pywt.scale2frequency(wavelet, np.arange(8, 30))* fs , y_train, "CWT_"+wavelet)
 
             # Grid search the appropriate dimension and dropout for the data format
             for dim in [256, 128]:
