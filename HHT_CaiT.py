@@ -4,6 +4,7 @@ from misc.utils import *
 from torchHHT import hht
 import torch
 from misc.Visualization import visualize
+import numpy as np
 print("Please wait, data extraction in progress...")
 # 1.) DEFINE SUBJECTS AND MOTOR IMAGERY PERIOD
 fs = 250

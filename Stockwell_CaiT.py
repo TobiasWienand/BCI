@@ -2,9 +2,8 @@ from train_test_scripts import fit_predict
 from vit_pytorch.cait import CaiT
 from misc.utils import *
 import numpy as np
-from stockwell import st
 from misc.Visualization import visualize
-
+#from stockwell import st
 print("Please wait, data extraction in progress...")
 # 1.) DEFINE SUBJECTS AND MOTOR IMAGERY PERIOD
 fs = 250
@@ -20,15 +19,23 @@ x_test, y_test, IDs = get_trials(subjects, start=start, stop=stop, dataset="eval
 x_train = x_train.swapaxes(1, 2)
 x_test = x_test.swapaxes(1, 2)
 x_train_transformed = np.apply_along_axis(lambda arr: st.st(arr, 8, 30), 2, x_train)
-x_test_transformed = np.apply_along_axis(lambda arr: st.st(arr, 8, 30), 2, x_train)
+x_test_transformed = np.apply_along_axis(lambda arr: st.st(arr, 8, 30), 2, x_test)
+#np.save("Data/x_train_transformed.npy", x_train_transformed)
+#np.save("Data/x_test_transformed.npy", x_test_transformed)
+#x_train_transformed = np.load("Data/x_train_transformed.npy") #Unfortunately I can only use Torch in Python Version 3.11 and Stockwell in 3.7
+#x_test_transformed = np.load("Data/x_test_transformed.npy")
 
 results = []
 # 3.) TRANSFORM TO FREQUENCY DOMAIN
 for density in [10, 20]:
     for segment_size in [2, 5]:
         # Densify the data
-        x_train_transformed_dense = densify(x_train_transformed, density)
-        x_test_transformed_dense = densify(x_test_transformed, density)
+        densified_train = densify(x_train_transformed, density)
+        densified_test = densify(x_test_transformed, density)
+
+        # Create separate arrays for the real and imaginary parts
+        x_train_transformed_dense = np.concatenate((densified_train.real, densified_train.imag), axis=2)
+        x_test_transformed_dense = np.concatenate((densified_test.real, densified_test.imag), axis=2)
 
 
         # Pad with zeros to make the PSD width divisible by the time segment size

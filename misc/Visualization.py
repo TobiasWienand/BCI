@@ -11,7 +11,7 @@ def visualize(Zxx_train, t_train, f_train, y_train, method):
     Zxx_train_class2_mean = np.mean(Zxx_train_class2, axis=0)
 
     # Compute the absolute difference between the two means
-    Zxx_diff = np.abs(Zxx_train_class1_mean - Zxx_train_class2_mean)
+    Zxx_diff = np.abs(np.abs(Zxx_train_class1_mean) - np.abs(Zxx_train_class2_mean))
 
     # Creating the figure and subplots
     fig, axs = plt.subplots(3, 1, figsize=(10, 15))
