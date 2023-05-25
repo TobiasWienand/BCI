@@ -24,7 +24,7 @@ x_test = x_test.swapaxes(1, 2)
 
 results = []
 # 3.) TRANSFORM TO FREQUENCY DOMAIN
-for wavelet in ["cmorB-C", "morl", "mexh"]:  #TODO Work in Progress
+for wavelet in ["shan1.0-1.0", "cgau6", "cmor2.0-1.0", "morl", "mexh"]:  #TODO Work in Progress
     for density in [10, 20]:
         for segment_size in [2, 5]:
 
@@ -36,6 +36,11 @@ for wavelet in ["cmorB-C", "morl", "mexh"]:  #TODO Work in Progress
             x_train_cwt = densify(x_train_cwt, density)
             x_test_cwt = densify(x_test_cwt, density)
 
+
+            if x_train_cwt.dtype == complex:
+                x_train_cwt = np.abs(x_train_cwt)
+                x_test_cwt = np.abs(x_test_cwt)
+
             # Pad with zeros to make the PSD width divisible by the time segment size
             required_padding = (segment_size - (x_train_cwt.shape[3] % segment_size)) % segment_size
             x_train_cwt = np.pad(x_train_cwt, ((0, 0), (0, 0), (0, 0), (0, required_padding)), mode='constant', constant_values=0)
@@ -43,35 +48,35 @@ for wavelet in ["cmorB-C", "morl", "mexh"]:  #TODO Work in Progress
             visualize(x_train_cwt, np.array([3+ i/250 for i in range(x_train_cwt.shape[-1]*density)]), pywt.scale2frequency(wavelet, np.arange(8, 30))* fs , y_train, "CWT_"+wavelet)
 
             # Grid search the appropriate dimension and dropout for the data format
-            for dim in [256, 128]:
-                for dropout in [0.1, 0.2]:
-                    for emb_dropout in [0.1, 0.2]:
-                        for layer_dropout in [0.1, 0.2]:
-                            v = CaiT(
-                                image_height=x_train_cwt.shape[2],
-                                image_width=x_train_cwt.shape[3],
-                                patch_height=x_train_cwt.shape[2],
-                                patch_width=segment_size,
-                                num_classes=2,
-                                dim=dim,
-                                depth=6, #not super important according to Random Forest
-                                cls_depth=2,  # depth of cross attention of CLS tokens to patch. Unique to CaiT
-                                heads=16, #not super important according to Random Forest
-                                mlp_dim=256, #not super important according to Random Forest
-                                dropout=dropout,
-                                emb_dropout=emb_dropout,
-                                layer_dropout = layer_dropout # Unique to CaiT. Triple regularization
-                            )
 
-                            total_acc, individual_accs = fit_predict(v, x_train_cwt, y_train, x_test_cwt, y_test, IDs, epochs=10, crossval=10)
-                            print("Total Test Accuracy:", total_acc)
-                            result = [wavelet, density, segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc]
-                            # Add individual accuracies to the result list
-                            for subject_id in sorted(individual_accs.keys()):
-                                result.append(individual_accs[subject_id])
+            for dropout in [0.1, 0.2]:
+                for emb_dropout in [0.1, 0.2]:
+                    for layer_dropout in [0.1, 0.2]:
+                        v = CaiT(
+                            image_height=x_train_cwt.shape[2],
+                            image_width=x_train_cwt.shape[3],
+                            patch_height=x_train_cwt.shape[2],
+                            patch_width=segment_size,
+                            num_classes=2,
+                            dim=256, #not super important according to Random Forest
+                            depth=6, #not super important according to Random Forest
+                            cls_depth=2,  # depth of cross attention of CLS tokens to patch. Unique to CaiT
+                            heads=16, #not super important according to Random Forest
+                            mlp_dim=256, #not super important according to Random Forest
+                            dropout=dropout,
+                            emb_dropout=emb_dropout,
+                            layer_dropout = layer_dropout # Unique to CaiT. Triple regularization
+                        )
 
-                            results.append(result)
+                        total_acc, individual_accs = fit_predict(v, x_train_cwt, y_train, x_test_cwt, y_test, IDs, epochs=10, crossval=10)
+                        print("Total Test Accuracy:", total_acc)
+                        result = [wavelet, density, segment_size, dropout, emb_dropout, layer_dropout, total_acc]
+                        # Add individual accuracies to the result list
+                        for subject_id in sorted(individual_accs.keys()):
+                            result.append(individual_accs[subject_id])
+
+                        results.append(result)
 
 # Save the results to a CSV file
-header = ["Wavelet", "Density", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)]
+header = ["Wavelet", "Density", "Segment_Size", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)]
 save_results_to_csv("Results/CWT.csv", header, results)

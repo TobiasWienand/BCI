@@ -40,7 +40,7 @@ for window_size, overlap in [(512, 500), (128, 64)]:
                            constant_values=0)
         Zxx_test = np.pad(Zxx_test, ((0, 0), (0, 0), (0, 0), (0, required_padding)), mode='constant', constant_values=0)
 
-        visualize(Zxx_train, np.array([3 + i / 250 for i in range(Zxx_train.shape[-1])]), f_train,
+        visualize(Zxx_train, np.array([3 + i / 250 for i in range(Zxx_train.shape[-1])]), f_train[mu_beta_band],
                   y_train, "STFT")
         # Grid search the appropriate dimension and dropout for the data format
         for dim in [256, 128]:
