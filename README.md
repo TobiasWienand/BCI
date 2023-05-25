@@ -1,7 +1,6 @@
 # Roadmap
 This README serves to illustrate the progress in this project.
 
-:clock1: STFT.csv will be uploaded this week.
 ## 1. Rectangular Patches for CaiT :heavy_check_mark:
 We have implemented rectangular patches for the CaiT architecture, which allows us to analyze how ViTs perform in the frequency domain.
 
@@ -23,7 +22,7 @@ We will investigate various feature extraction methods, including:
 -   4.2 Hilbert-Huang Transform (HHT) :heavy_check_mark:
     
     -   Parameters: Density, Segment Size
--   4.3 Continuous Wavelet Transform (CWT) :new:
+-   4.3 Continuous Wavelet Transform (CWT) :clock1:
     -   Currently being revised: Scales being adapted to wavelet, complex wavelets, parametrized wavelets
     -   Parameters: wavelet function,Density, Segment Size
 -   4.4 Stockwell Transform (S-Transform) :heavy_check_mark:
