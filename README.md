@@ -1,3 +1,10 @@
+
+|                                                                          |                                                                            |                                                                             |
+|:------------------------------------------------------------------------:|:--------------------------------------------------------------------------:|:---------------------------------------------------------------------------:|
+|           <img width="1604"  src="Results/img/STFT.png">  STFT           |             <img width="1604"  src="Results/img/HHT.png">  HHT             |        <img width="1604"  src="Results/img/Stockwell.png">Stockwell         |
+| <img width="1604"  src="Results/img/CWT_cmor.png">  Complex Morl Wavelet | <img width="1604"  src="Results/img/CWT_cgau6.png">  Complex Gauss Wavelet | <img width="1604"  src="Results/img/CWT_shan.png">  Complex Shannon Wavelet |
+
+
 # Roadmap
 This README serves to illustrate the progress in this project.
 
@@ -42,3 +49,6 @@ After obtaining the best parameters for each transformation, we will explore ens
 ## 6. Review and Future Steps
 
 -   We will have a meeting to review the intermediate results and plan the next steps, which may include different ensembling methods or moving to the time domain.
+
+
+
