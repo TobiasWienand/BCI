@@ -1,8 +1,9 @@
 
-|                                                                          |                                                                            |                                                                             |
-|:------------------------------------------------------------------------:|:--------------------------------------------------------------------------:|:---------------------------------------------------------------------------:|
-|           <img width="1604"  src="Results/img/STFT.png">  STFT           |             <img width="1604"  src="Results/img/HHT.png">  HHT             |        <img width="1604"  src="Results/img/Stockwell.png">Stockwell         |
-| <img width="1604"  src="Results/img/CWT_cmor.png">  Complex Morl Wavelet | <img width="1604"  src="Results/img/CWT_cgau6.png">  Complex Gauss Wavelet | <img width="1604"  src="Results/img/CWT_shan.png">  Complex Shannon Wavelet |
+|                                                                              |                                                                                |                                                                                 |
+|:----------------------------------------------------------------------------:|:------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|
+|           <img width="1604"  src="Results/img/STFT.png">  STFT 76%           |             <img width="1604"  src="Results/img/HHT.png">  HHT 69%             |        <img width="1604"  src="Results/img/Stockwell.png">Stockwell 66%         |
+| <img width="1604"  src="Results/img/CWT_cmor.png">  Complex Morl Wavelet 71% | <img width="1604"  src="Results/img/CWT_cgau6.png">  Complex Gauss Wavelet 69% | <img width="1604"  src="Results/img/CWT_shan.png">  Complex Shannon Wavelet 71% |
+|     <img width="1604"  src="Results/img/CWT_morl.png">  Morl Wavelet 66%     |  <img width="1604"  src="Results/img/CWT_mexh.png">  Mexican Hat Wavelet 65%   |      <img width="1604"  src="Results/img/Wigner_Ville.png">  Wigner_Ville       |
 
 
 # Roadmap
@@ -29,9 +30,8 @@ We will investigate various feature extraction methods, including:
 -   4.2 Hilbert-Huang Transform (HHT) :heavy_check_mark:
     
     -   Parameters: Density, Segment Size
--   4.3 Continuous Wavelet Transform (CWT) :clock1:
-    -   Currently being revised: Scales being adapted to wavelet, complex wavelets, parametrized wavelets
-    -   Parameters: wavelet function,Density, Segment Size
+-   4.3 Continuous Wavelet Transform (CWT) :heavy_check_mark:
+    -   Parameters: wavelet function, Density, Segment Size
 -   4.4 Stockwell Transform (S-Transform) :heavy_check_mark:
     
     -   Parameters: Density, Segment Size

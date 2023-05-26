@@ -3,7 +3,7 @@ from vit_pytorch.cait import CaiT
 from misc.utils import *
 import numpy as np
 from misc.Visualization import visualize
-#from stockwell import st
+from stockwell import st
 print("Please wait, data extraction in progress...")
 # 1.) DEFINE SUBJECTS AND MOTOR IMAGERY PERIOD
 fs = 250
