@@ -1,12 +1,4 @@
-# Results at a glance
-
-|                                                                              |                                                                                |                                                                                 |
-|:----------------------------------------------------------------------------:|:------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|
-|           <img width="1604"  src="Results/img/STFT.png">  STFT 76%           |             <img width="1604"  src="Results/img/CWT_shan.png">  Complex Shannon Wavelet 71%            |        <img width="1604"  src="Results/img/CWT_cmor.png">  Complex Morl Wavelet 71%         |
-|            <img width="1604"  src="Results/img/HHT.png">  HHT 69%            |             <img width="1604"  src="Results/img/CWT_cgau6.png">  Complex Gauss Wavelet 69%             |        <img width="1604"  src="Results/img/Stockwell.png">Stockwell 66% |
-
-
-# Description of the Project Structure
+# BCI Competition 2b Analysis
 
 
 ## Data

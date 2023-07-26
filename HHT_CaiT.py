@@ -64,15 +64,17 @@ for density in [5, 10, 20]:
                             layer_dropout = layer_dropout # Unique to CaiT. Triple regularization
                         )
 
-                        total_acc, individual_accs = fit_predict(v, Zxx_train_densified, y_train, Zxx_test_densified, y_test, IDs, epochs=10, crossval=10)
+                        total_acc, individual_accs, total_var, individual_vars = fit_predict(v, Zxx_train_densified, y_train, Zxx_test_densified, y_test, IDs, epochs=10, crossval=10)
                         print("Total Test Accuracy:", total_acc)
-                        result = [density, segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc]
+                        result = [density, segment_size, dim, dropout, emb_dropout, layer_dropout, total_acc, total_var]
                         # Add individual accuracies to the result list
                         for subject_id in sorted(individual_accs.keys()):
                             result.append(individual_accs[subject_id])
+                        for subject_id in sorted(individual_vars.keys()):
+                            result.append(individual_vars[subject_id])
 
                         results.append(result)
 
 # Save the results to a CSV file
-header = ["Density", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)]
+header = ["Density", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy", "Total_Test_Variance"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)] + [f"Subject_{i}_Variance" for i in range(1, 10)]
 save_results_to_csv("Results/HHT.csv", header, results)

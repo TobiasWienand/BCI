@@ -6,15 +6,30 @@ from sklearn.model_selection import KFold
 import matplotlib.pyplot as plt
 from torch import Tensor
 from copy import deepcopy
+import numpy as np
+
 
 def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval, fancy_plot=True):
+    """
+    This function trains the neural network, predicts the class labels on the test data and returns the results. Optionally the training is plotted.
+    :param v_start: The initial model with random weights
+    :param x_train: The training x data
+    :param y_train: The training y data
+    :param x_test: The test x data
+    :param y_test: The test y data
+    :param IDs: A vector that described which of the test data points belongs to which subject
+    :param epochs: A number that specifies for how many epochs to train
+    :param crossval: A number that specifies how much folds to cross validate
+    :param fancy_plot: If true we plot the training and cross val error for each fold
+    :return: total and individual accuracies and variances
+    """
     lr = 3e-5
     batch_size = 64
     criterion = nn.CrossEntropyLoss()
     total_test_accuracy = 0
 
-    # Initialize a dictionary to store the correct and total counts for each subject
     subject_counts = {subject: {"correct": 0, "total": 0} for subject in range(1, 10)}
+    subject_predictions = {subject: [] for subject in range(1, 10)}
 
     if fancy_plot:
         fig, axs = plt.subplots(2, crossval, sharex="all", sharey="all")
@@ -90,8 +105,8 @@ def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval
             val_acc_history.append(float(epoch_val_accuracy))
             train_loss_history.append(float(epoch_loss))
             val_loss_history.append(float(epoch_val_loss))
-            print(f'Fold: {k+1}/{crossval}, Epoch: {epoch+1}/{epochs}, Train Acc: {epoch_accuracy:.4f}, Train Loss: {epoch_loss:.4f}, Val Acc: {epoch_val_accuracy:.4f}, Val Loss: {epoch_val_loss:.4f}')
-
+            print(
+                f'Fold: {k + 1}/{crossval}, Epoch: {epoch + 1}/{epochs}, Train Acc: {epoch_accuracy:.4f}, Train Loss: {epoch_loss:.4f}, Val Acc: {epoch_val_accuracy:.4f}, Val Loss: {epoch_val_loss:.4f}')
 
         if fancy_plot:
             axs[0, k].plot(train_acc_history)
@@ -104,7 +119,7 @@ def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval
             axs[1, 0].set_ylabel("Loss")
             axs[1, k].plot(train_loss_history)
             axs[1, k].plot(val_loss_history)
-        # Test the best model on the test set for the current fold
+
         epoch_test_accuracy = 0
         for batch_index in range(batches_test):
             data = Tensor(x_test)[batch_index * batch_size: (batch_index + 1) * batch_size]
@@ -116,10 +131,10 @@ def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval
             test_output = best_model(data)
             correct_preds = (test_output.argmax(dim=1) == label).float()
 
-            # Update the subject_counts dictionary for each subject in the current batch
             for i, subject_id in enumerate(IDs[batch_index * batch_size: (batch_index + 1) * batch_size]):
                 subject_counts[subject_id]["correct"] += correct_preds[i]
                 subject_counts[subject_id]["total"] += 1
+                subject_predictions[subject_id].append(correct_preds[i].item())
 
             acc = correct_preds.mean()
             epoch_test_accuracy += acc * current_batch_size / x_test.shape[0]
@@ -127,13 +142,15 @@ def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval
         total_test_accuracy += epoch_test_accuracy / crossval
         print(f'Fold: {k + 1}/{crossval}, Test Acc: {epoch_test_accuracy:.4f}')
 
-
     if fancy_plot:
         plt.tight_layout()
         plt.show()
 
-    # Calculate the individual accuracies for each subject
     individual_accuracies = {subject: float(subject_counts[subject]["correct"] / subject_counts[subject]["total"])
                              for subject in subject_counts}
+    individual_variances = {subject: np.var(subject_predictions[subject]) for subject in subject_predictions}
 
-    return float(total_test_accuracy), individual_accuracies
+    all_predictions = [pred for subject in subject_predictions for pred in subject_predictions[subject]]
+    total_variance = np.var(all_predictions)
+
+    return float(total_test_accuracy), individual_accuracies, total_variance, individual_variances

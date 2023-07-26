@@ -2,6 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def visualize(Zxx_train, t_train, f_train, y_train, method):
+    """
+    This creates a plot of the difference of the average spectro- or scalogram in Zxx_train between class 1 and 2
+    :param Zxx_train: The 4D array contains the spectrograms or scalograms
+    :param t_train: Contains the time points to label x-axis appropriately
+    :param f_train: Contains the frequencies to label y-axis appropriately
+    :param y_train: Contains the class labels to seperate the two classes
+    :param method: A string describing the time-frequency analysis method, e.g. "STFT"
+    :return: nothing
+    """
     # Separate Zxx_train into two classes according to y_train
     Zxx_train_class1 = Zxx_train[y_train == 1]
     Zxx_train_class2 = Zxx_train[y_train == 2]

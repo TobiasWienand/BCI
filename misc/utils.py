@@ -56,6 +56,12 @@ def get_trials(subjects, start, stop, dataset):
     return np.stack(X_t), np.stack(Y_t).ravel(), np.stack(subject_labels) # ravel => remove dimension of length 1
 
 def densify(data, density):
+    """
+    This function takes data, usually a spectro- or scalogram, and sums up adjacent columns to make the data less wide and thereby prevent overfitting.
+    :param data: A 4D array (no_samples, channels, freq or scales, time)
+    :param density: A number that specifies how many adjacent columns will be summed up together to one column
+    :return: A 4D array (no_samples, channels, freq or scales, time)
+    """
     assert data.shape[3] % density == 0, "Data size must be divisible by density"
     densified_data = data.reshape(data.shape[0], data.shape[1], data.shape[2], data.shape[3] // density, density)
     densified_data = densified_data.sum(axis=4)
@@ -63,6 +69,11 @@ def densify(data, density):
 
 
 def divisors(n):
+    """
+    Returns the divisors of the natural number n
+    :param n: A natural number
+    :return: A list of divisors
+    """
     divs = [1]
     for i in range(2,int(math.sqrt(n))+1):
         if n%i == 0:
@@ -72,6 +83,13 @@ def divisors(n):
 
 
 def save_results_to_csv(filename, header, results):
+    """
+    This function creates a csv file that contains the experiment results, sorted by total accuracy
+    :param filename: A string
+    :param header: A list of strings describing the parameters and results
+    :param results: An array that contains the experimental results
+    :return: nothing
+    """
     # Convert the results to a DataFrame
     df = pd.DataFrame(results, columns=header)
 
