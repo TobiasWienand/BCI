@@ -5,7 +5,7 @@
 |           <img width="1604"  src="Results/img/STFT.png">  STFT 76%           |             <img width="1604"  src="Results/img/CWT_shan.png">  Complex Shannon Wavelet 71%            |        <img width="1604"  src="Results/img/CWT_cmor.png">  Complex Morl Wavelet 71%         |
 |            <img width="1604"  src="Results/img/HHT.png">  HHT 69%            |             <img width="1604"  src="Results/img/CWT_cgau6.png">  Complex Gauss Wavelet 69%             |        <img width="1604"  src="Results/img/Stockwell.png">Stockwell 66% |
 
-
+Ensemble method: 78%
 # Description of the Project Structure
 
 
@@ -43,4 +43,10 @@ the classifier, in our case the CaiT Vision Transformer. The accuracy and varian
 
 ## train_test_scripts.py
 
-This function trains the neural network, predicts the class labels on the test data and returns the results. Optionally the training is plotted.
+The fit_predict function trains the neural network, predicts the class labels on the test data and returns the results. Optionally the training is plotted.
+The fit_predict_confidences function works mostly the same but without visualization and logging. At the end, the confidences are extracted from the last (softmax) layer
+
+## Ensemble.py
+
+This implements an ensemble model, incorporating two Vision Transformer, each of which has been trained on either STFT or Shannon Wavelet transformed data. 
+Using the confidences from both models, the class is predicted that has the highest sum confidence

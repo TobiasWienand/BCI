@@ -58,7 +58,7 @@ for wavelet in ["shan1.0-1.0", "cgau6", "cmor2.0-1.0"]:
                                 patch_height=x_train_cwt.shape[2],
                                 patch_width=segment_size,
                                 num_classes=2,
-                                dim=256, #not super important according to Random Forest
+                                dim=dim,
                                 depth=6, #not super important according to Random Forest
                                 cls_depth=2,  # depth of cross attention of CLS tokens to patch. Unique to CaiT
                                 heads=16, #not super important according to Random Forest
@@ -80,5 +80,5 @@ for wavelet in ["shan1.0-1.0", "cgau6", "cmor2.0-1.0"]:
                             results.append(result)
 
 # Save the results to a CSV file
-header = ["Wavelet", "Density", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)] + [f"Subject_{i}_Variance" for i in range(1, 10)]
+header = ["Wavelet", "Density", "Segment_Size", "Dim", "Dropout", "Emb_Dropout", "Layer_Dropout", "Total_Test_Accuracy", "Total_Test_Variance"] + [f"Subject_{i}_Accuracy" for i in range(1, 10)] + [f"Subject_{i}_Variance" for i in range(1, 10)]
 save_results_to_csv("Results/CWT.csv", header, results)

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from torch import Tensor
 from copy import deepcopy
 import numpy as np
-
+import torch.nn.functional as F
 
 def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval, fancy_plot=True):
     """
@@ -154,3 +154,114 @@ def fit_predict(v_start, x_train, y_train, x_test, y_test, IDs, epochs, crossval
     total_variance = np.var(all_predictions)
 
     return float(total_test_accuracy), individual_accuracies, total_variance, individual_variances
+
+
+def fit_predict_confidences(v_start, x_train, y_train, x_test, y_test, epochs, crossval):
+    """
+        This function trains the neural network, predicts the class labels on the test data and returns the results. Optionally the training is plotted.
+        :param v_start: The initial model with random weights
+        :param x_train: The training x data
+        :param y_train: The training y data
+        :param x_test: The test x data
+        :param y_test: The test y data
+        :param IDs: A vector that described which of the test data points belongs to which subject
+        :param epochs: A number that specifies for how many epochs to train
+        :param crossval: A number that specifies how much folds to cross validate
+        :return: total and individual accuracies and variances
+        """
+    lr = 3e-5
+    batch_size = 64
+    criterion = nn.CrossEntropyLoss()
+    total_test_accuracy = 0
+    fold_confidences = {}  # store confidences for each fold here
+    highest_val_accuracy = 0
+    best_fold = -1
+
+    kf = KFold(n_splits=crossval, shuffle=True)  # initialize KFold
+
+    for k, (train_index, val_index) in enumerate(kf.split(x_train, y_train)):
+        x_train_fold, x_val_fold = x_train[train_index], x_train[val_index]
+        y_train_fold, y_val_fold = y_train[train_index], y_train[val_index]
+
+        batches_train = ceil((x_train_fold.shape[0] / batch_size))
+        batches_val = ceil((x_val_fold.shape[0] / batch_size))
+        batches_test = ceil((x_test.shape[0] / batch_size))
+
+        v = deepcopy(v_start).to("cuda")
+        optimizer = optim.Adam(v.parameters(), lr=lr)
+
+        highest_observed_val_acc = 0
+        best_model = None
+
+        for epoch in range(epochs):
+            epoch_loss = 0
+            epoch_accuracy = 0
+
+            for batch_index in range(batches_train):
+                data = Tensor(x_train_fold)[batch_index * batch_size:(batch_index + 1) * batch_size]
+                label = Tensor(y_train_fold)[batch_index * batch_size: (batch_index + 1) * batch_size].long() - 1
+                current_batch_size = len(data)
+                data = data.to("cuda")
+                label = label.to("cuda")
+
+                output = v(data)
+                loss = criterion(output, label)
+
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                acc = (output.argmax(dim=1) == label).float().mean()
+                epoch_accuracy += acc * current_batch_size / x_train_fold.shape[0]
+                epoch_loss += loss * current_batch_size / x_train_fold.shape[0]
+
+            with torch.no_grad():
+                epoch_val_accuracy = 0
+                epoch_val_loss = 0
+
+                for batch_index in range(batches_val):
+                    data = Tensor(x_val_fold)[batch_index * batch_size: (batch_index + 1) * batch_size]
+                    label = Tensor(y_val_fold)[batch_index * batch_size: (batch_index + 1) * batch_size].long() - 1
+                    current_batch_size = len(data)
+                    data = data.to("cuda")
+                    label = label.to("cuda")
+
+                    val_output = v(data)
+                    val_loss = criterion(val_output, label)
+
+                    acc = (val_output.argmax(dim=1) == label).float().mean()
+                    epoch_val_accuracy += acc * current_batch_size / x_val_fold.shape[0]
+                    epoch_val_loss += val_loss * current_batch_size / x_val_fold.shape[0]
+
+            if epoch_val_accuracy > highest_observed_val_acc:
+                highest_observed_val_acc = epoch_val_accuracy
+                best_model = deepcopy(v)
+
+        confidences_k = []  # store confidences for this fold
+        epoch_test_accuracy = 0
+        for batch_index in range(batches_test):
+            data = Tensor(x_test)[batch_index * batch_size: (batch_index + 1) * batch_size]
+            label = Tensor(y_test)[batch_index * batch_size: (batch_index + 1) * batch_size].long() - 1
+            current_batch_size = len(data)
+            data = data.to("cuda")
+            label = label.to("cuda")
+
+            test_output = best_model(data)
+            softmax_output = F.softmax(test_output, dim=1)  # softmax to get probabilities
+            confidences_k.append(softmax_output.detach().cpu().numpy())  # save softmax output
+
+            correct_preds = (test_output.argmax(dim=1) == label).float()
+            acc = correct_preds.mean()
+            epoch_test_accuracy += acc * current_batch_size / x_test.shape[0]
+
+        fold_confidences[k] = np.concatenate(confidences_k, axis=0)  # concatenate all softmax outputs for this fold
+
+        if highest_observed_val_acc > highest_val_accuracy:  # save best model across folds
+            highest_val_accuracy = highest_observed_val_acc
+            best_fold = k
+
+        total_test_accuracy += epoch_test_accuracy / crossval
+        print(f'Fold: {k + 1}/{crossval}, Test Acc: {epoch_test_accuracy:.4f}')
+
+    confidences = fold_confidences[best_fold]  # get softmax outputs from best fold
+    return float(total_test_accuracy), confidences
